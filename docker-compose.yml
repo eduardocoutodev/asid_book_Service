@@ -1,0 +1,50 @@
+services:
+  mysql-book:
+    image: mysql:8.0.0
+    container_name: mysql-book
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: book_db
+      MYSQL_USER: book_user
+      MYSQL_PASSWORD: book_pass
+    ports:
+      - "3311:3306"
+    volumes:
+      - mysql-book-data:/var/lib/mysql
+    networks:
+      - book-network
+    command: --disable-ssl --skip-ssl
+
+  book-service:
+    build: .
+    profiles:
+      - application
+    container_name: book-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-book:3306/book_db
+      SPRING_DATASOURCE_USERNAME: book_user
+      SPRING_DATASOURCE_PASSWORD: book_pass
+    depends_on:
+      - mysql-book
+
+    ports:
+      - "8082:8082"
+    command: >
+      sh -c "
+        echo 'Aguardando MySQL...';
+        until mysqladmin ping -h mysql-book --silent; do
+          echo 'Ainda não disponivel...';
+          sleep 2;
+        done;
+        echo 'MySQL pronto! A iniciar aplicacao...';
+        java -jar app.jar
+      "
+    networks:
+      - book-network
+
+volumes:
+  mysql-book-data:
+
+networks:
+  book-network:
