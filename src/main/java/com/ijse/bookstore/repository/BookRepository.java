@@ -13,19 +13,18 @@ import com.ijse.bookstore.entity.Book;
 public interface BookRepository extends JpaRepository<Book,Long> {
 
     @Query("SELECT b FROM Book b " +
-            "LEFT JOIN b.author a " +          // Explicit LEFT JOIN
-            "LEFT JOIN b.category c " +        // Explicit LEFT JOIN
-            "LEFT JOIN b.subcategory sc " +    // Explicit LEFT JOIN
-            "WHERE (:query IS NULL OR " +
-            "LOWER(b.title) LIKE LOWER(concat('%', :query, '%')) OR " +
-            "LOWER(a.authorName) LIKE LOWER(concat('%', :query, '%')) OR " + // Check joined author name
-            "LOWER(c.name) LIKE LOWER(concat('%', :query, '%')) OR " +       // Check joined category name
-            "LOWER(sc.name) LIKE LOWER(concat('%', :query, '%')))")
+            "WHERE (:query is null OR " +
+            "b.title LIKE %:query% OR " +
+            "b.author.authorName LIKE %:query% OR " +
+            "b.category.name LIKE %:query% OR " +
+            "b.subcategory.name LIKE %:query%)")
     List<Book> searchBooks(@Param("query") String query);
 
 
     List<Book> findByCategoryId(Long id);
 
-    
+
+    @Query("SELECT b FROM Book b WHERE b.title = :title")
+    Book findByTitle(@Param("title") String title);
 
 }

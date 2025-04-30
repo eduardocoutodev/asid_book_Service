@@ -18,24 +18,18 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<Book> getAllBook(){
-
         return bookRepository.findAll();
     }
 
 
     @Override
     public Book getBookById(Long id){
-
-
         return bookRepository.findById(id).orElse(null);
     }
 
     @Override
     public List<Book> getBooksByCategoryID(Long id){
-
         return bookRepository.findByCategoryId(id);
-           
-            
     }
 
     @Override
@@ -45,16 +39,16 @@ public class BookServiceImpl implements BookService {
        
     @Override
     public Book patchBookQuantity(Long id, Book book){
-
         Book existBook = bookRepository.findById(id).orElse(null);
 
         if (existBook != null) {
-            
             existBook.setQuantity(book.getQuantity());
             bookRepository.save(existBook);
-    
+
             return existBook;
-        } else { 
+
+        } else {
+
             return null;
         }
     }
